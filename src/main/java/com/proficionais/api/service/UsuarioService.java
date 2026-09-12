@@ -26,6 +26,10 @@ public class UsuarioService {
 
     public Usuario cadastrarUsuario(UsuarioCadastroRequest request) {
 
+        if (usuarioRepository.existsByCpf(request.getCpf())) {
+            throw new IllegalArgumentException("CPF já cadastrado.");
+        }
+
         Usuario usuario = new Usuario();
 
         usuario.setNome(request.getNome());

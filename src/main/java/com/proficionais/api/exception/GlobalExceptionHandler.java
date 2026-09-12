@@ -13,4 +13,9 @@ public class GlobalExceptionHandler {
     public String tratarUsuarioNaoEncontrado(UsuarioNaoEncontradoException exception) {
         return exception.getMessage();
     }
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String tratarErroDeRegra(IllegalArgumentException exception) {
+        return exception.getMessage();
+    }
 }
