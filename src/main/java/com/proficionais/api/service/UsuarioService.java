@@ -30,6 +30,10 @@ public class UsuarioService {
             throw new IllegalArgumentException("CPF já cadastrado.");
         }
 
+        if (usuarioRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("E-mail já cadastrado.");
+        }
+
         Usuario usuario = new Usuario();
 
         usuario.setNome(request.getNome());
