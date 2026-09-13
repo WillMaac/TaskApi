@@ -4,10 +4,12 @@ import com.proficionais.api.dto.UsuarioAtualizacaoRequest;
 import com.proficionais.api.dto.UsuarioCadastroRequest;
 import com.proficionais.api.dto.UsuarioResponse;
 import com.proficionais.api.entity.Usuario;
+import com.proficionais.api.exception.BadRequestException;
 import com.proficionais.api.exception.UsuarioNaoEncontradoException;
 import com.proficionais.api.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -25,14 +27,15 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional
     public Usuario cadastrarUsuario(UsuarioCadastroRequest request) {
 
         if (usuarioRepository.existsByCpf(request.getCpf())) {
-            throw new IllegalArgumentException("CPF já cadastrado.");
+            throw new BadRequestException("CPF já cadastrado.");
         }
 
         if (usuarioRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("E-mail já cadastrado.");
+            throw new BadRequestException("E-mail já cadastrado.");
         }
 
         Usuario usuario = new Usuario();
@@ -82,6 +85,7 @@ public class UsuarioService {
         return response;
     }
 
+    @Transactional
     public UsuarioResponse atualizarUsuario(
             Long id,
             UsuarioAtualizacaoRequest request
@@ -93,11 +97,11 @@ public class UsuarioService {
                 ));
 
         if (usuarioRepository.existsByCpfAndIdNot(request.getCpf(), id)) {
-            throw new IllegalArgumentException("CPF já cadastrado.");
+            throw new BadRequestException("CPF já cadastrado.");
         }
 
         if (usuarioRepository.existsByEmailAndIdNot(request.getEmail(), id)) {
-            throw new IllegalArgumentException("E-mail já cadastrado.");
+            throw new BadRequestException("E-mail já cadastrado.");
         }
 
         usuario.setNome(request.getNome());
@@ -119,6 +123,7 @@ public class UsuarioService {
         return response;
     }
 
+    @Transactional
     public void excluirUsuario(Long id) {
 
         Usuario usuario = usuarioRepository.findById(id)
