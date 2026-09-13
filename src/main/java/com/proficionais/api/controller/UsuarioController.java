@@ -4,8 +4,12 @@ import com.proficionais.api.dto.UsuarioAtualizacaoRequest;
 import com.proficionais.api.dto.UsuarioCadastroRequest;
 import com.proficionais.api.dto.UsuarioResponse;
 import com.proficionais.api.entity.Usuario;
+import com.proficionais.api.enums.Perfil;
+import com.proficionais.api.exception.BadRequestException;
 import com.proficionais.api.service.UsuarioService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,29 +32,12 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    @PostMapping
-    public UsuarioResponse cadastrarUsuario(
-            @RequestBody @Valid UsuarioCadastroRequest request
-    ) {
-        Usuario usuario = usuarioService.cadastrarUsuario(request);
-
-        UsuarioResponse response = new UsuarioResponse();
-
-        response.setId(usuario.getId());
-        response.setNome(usuario.getNome());
-        response.setCpf(usuario.getCpf());
-        response.setEmail(usuario.getEmail());
-        response.setPerfil(usuario.getPerfil());
-
-        return response;
-    }
-
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PostMapping("/cadastro/gerente")
-    public UsuarioResponse cadastrarGerente(
+    public ResponseEntity<UsuarioResponse> cadastrarGerente(
             @RequestBody @Valid UsuarioCadastroRequest request
     ) {
-        request.setPerfil(com.proficionais.api.enums.Perfil.GERENTE);
+        request.setPerfil(Perfil.GERENTE);
 
         Usuario usuario = usuarioService.cadastrarUsuario(request);
 
@@ -62,13 +49,24 @@ public class UsuarioController {
         response.setEmail(usuario.getEmail());
         response.setPerfil(usuario.getPerfil());
 
-        return response;
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
     }
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'GERENTE')")
     @PostMapping("/cadastro/profissional")
-    public UsuarioResponse cadastrarProfissional(
+    public ResponseEntity<UsuarioResponse> cadastrarProfissional(
             @RequestBody @Valid UsuarioCadastroRequest request
     ) {
+        if (request.getPerfil() == Perfil.SUPER_ADMIN
+                || request.getPerfil() == Perfil.GERENTE) {
+
+            throw new BadRequestException(
+                    "Esta rota aceita apenas os perfis MEDICO, ENFERMEIRO ou ATENDENTE."
+            );
+        }
+
         Usuario usuario = usuarioService.cadastrarUsuario(request);
 
         UsuarioResponse response = new UsuarioResponse();
@@ -79,7 +77,9 @@ public class UsuarioController {
         response.setEmail(usuario.getEmail());
         response.setPerfil(usuario.getPerfil());
 
-        return response;
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
     }
 
     @GetMapping
