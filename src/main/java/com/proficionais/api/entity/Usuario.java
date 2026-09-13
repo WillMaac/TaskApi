@@ -8,16 +8,24 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.Column;
 
 @Entity
 @Table(name = "usuarios")
 public class Usuario {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String nome;
+
+    @Column(unique = true, nullable = false)
     private String cpf;
+
+    @Column(unique = true, nullable = false)
     private String email;
+
     private String senha;
 
     @Enumerated(EnumType.STRING)

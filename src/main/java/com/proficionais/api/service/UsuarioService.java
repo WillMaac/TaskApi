@@ -1,5 +1,6 @@
 package com.proficionais.api.service;
 
+import com.proficionais.api.dto.UsuarioAtualizacaoRequest;
 import com.proficionais.api.dto.UsuarioCadastroRequest;
 import com.proficionais.api.dto.UsuarioResponse;
 import com.proficionais.api.entity.Usuario;
@@ -7,7 +8,7 @@ import com.proficionais.api.exception.UsuarioNaoEncontradoException;
 import com.proficionais.api.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.proficionais.api.dto.UsuarioAtualizacaoRequest;
+
 import java.util.List;
 
 @Service
@@ -90,6 +91,14 @@ public class UsuarioService {
                 .orElseThrow(() -> new UsuarioNaoEncontradoException(
                         "Usuário não encontrado."
                 ));
+
+        if (usuarioRepository.existsByCpfAndIdNot(request.getCpf(), id)) {
+            throw new IllegalArgumentException("CPF já cadastrado.");
+        }
+
+        if (usuarioRepository.existsByEmailAndIdNot(request.getEmail(), id)) {
+            throw new IllegalArgumentException("E-mail já cadastrado.");
+        }
 
         usuario.setNome(request.getNome());
         usuario.setCpf(request.getCpf());

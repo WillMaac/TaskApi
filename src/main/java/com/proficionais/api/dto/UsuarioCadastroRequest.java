@@ -3,18 +3,22 @@ package com.proficionais.api.dto;
 import com.proficionais.api.enums.Perfil;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import com.proficionais.api.validation.CpfValido;
+import jakarta.validation.constraints.Size;
 
 public class UsuarioCadastroRequest {
     @NotBlank
     private String nome;
 
     @NotBlank
+    @CpfValido
     private String cpf;
 
     @NotBlank
     private String email;
 
     @NotBlank
+    @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres.")
     private String senha;
 
     @NotNull

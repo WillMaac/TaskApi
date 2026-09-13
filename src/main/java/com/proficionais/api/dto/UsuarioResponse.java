@@ -1,6 +1,16 @@
 package com.proficionais.api.dto;
 
 import com.proficionais.api.enums.Perfil;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
+
+@JsonPropertyOrder({
+        "id",
+        "nome",
+        "cpf",
+        "email",
+        "perfil"
+})
 
 public class UsuarioResponse {
 

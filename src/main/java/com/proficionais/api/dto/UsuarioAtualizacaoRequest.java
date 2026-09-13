@@ -4,6 +4,8 @@ import com.proficionais.api.enums.Perfil;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import com.proficionais.api.validation.CpfValido;
+import jakarta.validation.constraints.Size;
 
 public class UsuarioAtualizacaoRequest {
 
@@ -11,6 +13,7 @@ public class UsuarioAtualizacaoRequest {
     private String nome;
 
     @NotBlank
+    @CpfValido
     private String cpf;
 
     @Email
@@ -18,6 +21,7 @@ public class UsuarioAtualizacaoRequest {
     private String email;
 
     @NotBlank
+    @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres.")
     private String senha;
 
     @NotNull

@@ -1,19 +1,20 @@
 package com.proficionais.api.controller;
 
+import com.proficionais.api.dto.UsuarioAtualizacaoRequest;
 import com.proficionais.api.dto.UsuarioCadastroRequest;
 import com.proficionais.api.dto.UsuarioResponse;
 import com.proficionais.api.entity.Usuario;
 import com.proficionais.api.service.UsuarioService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
-import com.proficionais.api.dto.UsuarioAtualizacaoRequest;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.util.List;
 
@@ -29,6 +30,43 @@ public class UsuarioController {
 
     @PostMapping
     public UsuarioResponse cadastrarUsuario(
+            @RequestBody @Valid UsuarioCadastroRequest request
+    ) {
+        Usuario usuario = usuarioService.cadastrarUsuario(request);
+
+        UsuarioResponse response = new UsuarioResponse();
+
+        response.setId(usuario.getId());
+        response.setNome(usuario.getNome());
+        response.setCpf(usuario.getCpf());
+        response.setEmail(usuario.getEmail());
+        response.setPerfil(usuario.getPerfil());
+
+        return response;
+    }
+
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PostMapping("/cadastro/gerente")
+    public UsuarioResponse cadastrarGerente(
+            @RequestBody @Valid UsuarioCadastroRequest request
+    ) {
+        request.setPerfil(com.proficionais.api.enums.Perfil.GERENTE);
+
+        Usuario usuario = usuarioService.cadastrarUsuario(request);
+
+        UsuarioResponse response = new UsuarioResponse();
+
+        response.setId(usuario.getId());
+        response.setNome(usuario.getNome());
+        response.setCpf(usuario.getCpf());
+        response.setEmail(usuario.getEmail());
+        response.setPerfil(usuario.getPerfil());
+
+        return response;
+    }
+
+    @PostMapping("/cadastro/profissional")
+    public UsuarioResponse cadastrarProfissional(
             @RequestBody @Valid UsuarioCadastroRequest request
     ) {
         Usuario usuario = usuarioService.cadastrarUsuario(request);
